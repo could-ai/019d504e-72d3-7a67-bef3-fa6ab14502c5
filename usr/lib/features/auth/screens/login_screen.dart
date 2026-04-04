@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,7 +9,41 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isPhoneLogin = true;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await Supabase.instance.client.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      // AuthGate will automatically redirect to dashboard
+    } on AuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo Placeholder
                 Icon(
                   Icons.handshake_rounded,
                   size: 80,
@@ -46,65 +80,35 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 48),
 
-                // Toggle Login Method
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('Phone OTP'),
-                      selected: _isPhoneLogin,
-                      onSelected: (val) => setState(() => _isPhoneLogin = true),
-                    ),
-                    const SizedBox(width: 16),
-                    ChoiceChip(
-                      label: const Text('Email'),
-                      selected: !_isPhoneLogin,
-                      onSelected: (val) => setState(() => _isPhoneLogin = false),
-                    ),
-                  ],
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email Address',
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 24),
-
-                // Input Fields
-                if (_isPhoneLogin)
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Phone Number',
-                      prefixIcon: Icon(Icons.phone),
-                      hintText: '+252 ...',
-                    ),
-                    keyboardType: TextInputType.phone,
-                  )
-                else ...[
-                  const TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Email Address',
-                      prefixIcon: Icon(Icons.email),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: Icon(Icons.lock),
                   ),
-                  const SizedBox(height: 16),
-                  const TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: Icon(Icons.lock),
-                    ),
-                    obscureText: true,
-                  ),
-                ],
+                  obscureText: true,
+                ),
 
                 const SizedBox(height: 32),
                 ElevatedButton(
-                  onPressed: () {
-                    // TODO: Implement actual Supabase Auth
-                    Navigator.pushReplacementNamed(context, '/dashboard');
-                  },
-                  child: Text(_isPhoneLogin ? 'Send OTP' : 'Login'),
+                  onPressed: _isLoading ? null : _login,
+                  child: _isLoading 
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Login'),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    // TODO: Navigate to Registration
+                    Navigator.pushNamed(context, '/signup');
                   },
                   child: const Text('New to Iskudan? Join the Cooperative'),
                 ),

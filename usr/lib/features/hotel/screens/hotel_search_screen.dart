@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HotelSearchScreen extends StatelessWidget {
+class HotelSearchScreen extends StatefulWidget {
   const HotelSearchScreen({super.key});
+
+  @override
+  State<HotelSearchScreen> createState() => _HotelSearchScreenState();
+}
+
+class _HotelSearchScreenState extends State<HotelSearchScreen> {
+  final _supabase = Supabase.instance.client;
+  List<dynamic> _hotels = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHotels();
+  }
+
+  Future<void> _fetchHotels() async {
+    try {
+      final response = await _supabase.from('hotels').select();
+      setState(() {
+        _hotels = response;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading hotels: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,37 +78,26 @@ class HotelSearchScreen extends StatelessWidget {
             ),
           ),
 
-          // Hotel List
+          // Hotel List from Database
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildHotelCard(
-                  context,
-                  'Al Safwah Royale Orchid',
-                  'Makkah - 50m from Haram',
-                  4.8,
-                  '\$120',
-                  'Shared & Family Rooms Available',
-                ),
-                _buildHotelCard(
-                  context,
-                  'Pullman Zamzam Madina',
-                  'Madinah - 100m from Masjid an-Nabawi',
-                  4.7,
-                  '\$150',
-                  'Wheelchair Accessible',
-                ),
-                _buildHotelCard(
-                  context,
-                  'Iskudan Partner Hotel A',
-                  'Makkah - Aziziyah',
-                  4.2,
-                  '\$45',
-                  'Cooperative Discount Applied',
-                ),
-              ],
-            ),
+            child: _isLoading 
+              ? const Center(child: CircularProgressIndicator())
+              : _hotels.isEmpty 
+                ? const Center(child: Text('No hotels found.'))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _hotels.length,
+                    itemBuilder: (context, index) {
+                      final hotel = _hotels[index];
+                      return _buildHotelCard(
+                        context,
+                        hotel['name'] ?? 'Unknown Hotel',
+                        hotel['address'] ?? 'Unknown Location',
+                        (hotel['rating'] ?? 0).toDouble(),
+                        hotel['image_url'],
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -93,19 +115,21 @@ class HotelSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHotelCard(BuildContext context, String name, String location, double rating, String price, String tag) {
+  Widget _buildHotelCard(BuildContext context, String name, String location, double rating, String? imageUrl) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Placeholder Image
+          // Image
           Container(
             height: 150,
             width: double.infinity,
             color: Colors.grey[300],
-            child: const Icon(Icons.image, size: 50, color: Colors.grey),
+            child: imageUrl != null 
+                ? Image.network(imageUrl, fit: BoxFit.cover)
+                : const Icon(Icons.image, size: 50, color: Colors.grey),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
@@ -132,36 +156,16 @@ class HotelSearchScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(location, style: TextStyle(color: Colors.grey[600])),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    tag,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      '$price / night',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                       ),
-                      child: const Text('Book Now'),
+                      child: const Text('View Rooms'),
                     ),
                   ],
                 ),
