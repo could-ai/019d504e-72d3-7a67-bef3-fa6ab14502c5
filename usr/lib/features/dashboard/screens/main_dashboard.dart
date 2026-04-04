@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../cooperative/screens/cooperative_screen.dart';
 import '../../hotel/screens/hotel_search_screen.dart';
 import '../../qr/screens/qr_identity_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});
