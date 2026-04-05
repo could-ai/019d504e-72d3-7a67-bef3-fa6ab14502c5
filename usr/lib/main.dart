@@ -4,6 +4,11 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/signup_screen.dart';
 import 'features/dashboard/screens/main_dashboard.dart';
+import 'features/marketplace/screens/marketplace_screen.dart';
+import 'features/cargo/screens/cargo_screen.dart';
+import 'features/flights/screens/flight_screen.dart';
+import 'features/visa/screens/visa_screen.dart';
+import 'features/admin/screens/admin_dashboard.dart';
 import 'integrations/supabase.dart';
 
 void main() async {
@@ -33,6 +38,11 @@ class IskudanApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/dashboard': (context) => const MainDashboard(),
+        '/marketplace': (context) => const MarketplaceScreen(),
+        '/cargo': (context) => const CargoScreen(),
+        '/flights': (context) => const FlightScreen(),
+        '/visa': (context) => const VisaScreen(),
+        '/admin': (context) => const AdminDashboard(),
       },
       builder: (context, child) {
         ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
