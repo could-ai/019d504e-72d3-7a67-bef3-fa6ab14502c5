@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../cooperative/screens/cooperative_screen.dart';
-import '../hotels/screens/hotel_search_screen.dart';
-import '../qr/screens/qr_identity_screen.dart';
+import '../../cooperative/screens/cooperative_screen.dart';
+import '../../hotels/screens/hotel_search_screen.dart';
+import '../../qr/screens/qr_identity_screen.dart';
 
 class MainDashboard extends StatefulWidget {
   const MainDashboard({super.key});

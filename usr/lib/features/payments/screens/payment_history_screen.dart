@@ -60,7 +60,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                     return Card(
                       child: ListTile(
                         leading: const Icon(Icons.payment, color: Colors.green),
-                        title: Text('$${payment['amount']} - ${payment['method']}'),
+                        title: Text('\$${payment['amount']} - ${payment['method']}'),
                         subtitle: Text('${payment['status']} • ${payment['created_at']}'),
                         trailing: Text(payment['transaction_reference'], style: const TextStyle(fontSize: 12)),
                       ),

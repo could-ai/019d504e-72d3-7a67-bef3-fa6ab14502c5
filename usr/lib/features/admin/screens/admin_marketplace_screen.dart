@@ -69,9 +69,9 @@ class _AdminMarketplaceScreenState extends State<AdminMarketplaceScreen> {
                   child: ListTile(
                     leading: const Icon(Icons.shopping_bag),
                     title: Text(product['name']),
-                    subtitle: Text('Category: ${product['categories']['name']} • Stock: ${product['stock_quantity']} • $${product['price']}'),
+                    subtitle: Text('Category: ${product['categories']['name']} • Stock: ${product['stock_quantity']} • \$${product['price']}'),
                     trailing: product['approved'] == true
-                        ? const Chip(label: Text('Approved'), backgroundColor: Colors.green[100])
+                        ? Chip(label: const Text('Approved'), backgroundColor: Colors.green[100])
                         : ElevatedButton(
                             onPressed: () => _approveProduct(product),
                             child: const Text('Approve'),

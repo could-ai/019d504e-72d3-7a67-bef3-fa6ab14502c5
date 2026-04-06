@@ -75,7 +75,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Text('Total: $${order['total_amount']}'),
+                            Text('Total: \$${order['total_amount']}'),
                             const SizedBox(height: 8),
                             const Text('Items:', style: TextStyle(fontWeight: FontWeight.w500)),
                             ...items.map<Widget>((item) => Text('• ${item['products']['name']} (x${item['quantity']})')),
