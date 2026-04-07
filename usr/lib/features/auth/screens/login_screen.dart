@@ -14,6 +14,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _login() async {
+    // Dismiss keyboard on mobile
+    FocusScope.of(context).unfocus();
+
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
@@ -87,6 +90,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: Icon(Icons.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -96,14 +101,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: Icon(Icons.lock),
                   ),
                   obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.password],
+                  onSubmitted: (_) => _login(),
                 ),
 
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50), // Ensure large touch target for mobile
+                  ),
                   child: _isLoading 
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Login'),
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text('Login', style: TextStyle(fontSize: 16)),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
@@ -111,6 +126,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pushNamed(context, '/signup');
                   },
                   child: const Text('New to Iskudan? Join the Cooperative'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Navigate to forgot password (assuming route exists or will be created)
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Forgot password coming soon')),
+                    );
+                  },
+                  child: const Text('Forgot Password?'),
                 ),
               ],
             ),
