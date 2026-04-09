@@ -29,6 +29,9 @@ import 'features/admin/screens/admin_users_screen.dart';
 import 'features/admin/screens/admin_bookings_screen.dart';
 import 'features/admin/screens/admin_marketplace_screen.dart';
 import 'features/admin/screens/admin_cargo_screen.dart';
+import 'features/admin/screens/admin_flights_screen.dart';
+import 'features/admin/screens/admin_visas_screen.dart';
+import 'features/admin/screens/admin_payments_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -94,6 +97,9 @@ class MyApp extends StatelessWidget {
         '/admin_bookings': (context) => const AdminBookingsScreen(),
         '/admin_marketplace': (context) => const AdminMarketplaceScreen(),
         '/admin_cargo': (context) => const AdminCargoScreen(),
+        '/admin_flights': (context) => const AdminFlightsScreen(),
+        '/admin_visas': (context) => const AdminVisasScreen(),
+        '/admin_payments': (context) => const AdminPaymentsScreen(),
       },
     );
   }
