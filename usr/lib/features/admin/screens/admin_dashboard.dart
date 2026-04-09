@@ -29,22 +29,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _fetchStats() async {
     try {
-      // Fetch counts concurrently for better performance
-      final futures = await Future.wait([
-        _supabase.from('users').select('id').count(CountOption.exact),
-        _supabase.from('bookings').select('id').count(CountOption.exact),
-        _supabase.from('orders').select('id').count(CountOption.exact),
-        _supabase.from('shipments').select('id').count(CountOption.exact),
-        _supabase.from('visa').select('id').count(CountOption.exact),
-        _supabase.from('payments').select('amount').eq('status', 'success'),
+      // Fetch counts concurrently. Grouping similar return types (Future<int>) 
+      // avoids the List<Object> type inference error in Future.wait.
+      final counts = await Future.wait([
+        _supabase.from('users').count(CountOption.exact),
+        _supabase.from('bookings').count(CountOption.exact),
+        _supabase.from('orders').count(CountOption.exact),
+        _supabase.from('shipments').count(CountOption.exact),
+        _supabase.from('visa').count(CountOption.exact),
       ]);
 
-      final usersCount = futures[0] as PostgrestResponse;
-      final bookingsCount = futures[1] as PostgrestResponse;
-      final ordersCount = futures[2] as PostgrestResponse;
-      final shipmentsCount = futures[3] as PostgrestResponse;
-      final visasCount = futures[4] as PostgrestResponse;
-      final payments = futures[5] as List<dynamic>;
+      // Fetch payments separately since it returns a List<Map<String, dynamic>>
+      final payments = await _supabase.from('payments').select('amount').eq('status', 'success');
 
       double totalRevenue = 0;
       for (var p in payments) {
@@ -54,11 +50,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       if (mounted) {
         setState(() {
           _stats = {
-            'users': usersCount.count ?? 0,
-            'bookings': bookingsCount.count ?? 0,
-            'orders': ordersCount.count ?? 0,
-            'shipments': shipmentsCount.count ?? 0,
-            'visas': visasCount.count ?? 0,
+            'users': counts[0],
+            'bookings': counts[1],
+            'orders': counts[2],
+            'shipments': counts[3],
+            'visas': counts[4],
             'revenue': totalRevenue,
           };
           _isLoading = false;
